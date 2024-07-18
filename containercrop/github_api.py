@@ -80,7 +80,7 @@ class GithubAPI:
                 "Authorization": f"token {token}",
                 "X-GitHub-Api-Version": "2022-11-28",
             },
-            timeout=aiohttp.ClientTimeout(total=5),
+            # timeout=aiohttp.ClientTimeout(total=5),
         )
         self.is_user: bool | None = is_user
 
@@ -168,16 +168,25 @@ class GithubAPI:
         "Delete an image"
         if not image.url:
             logging.info("Could not delete image as it does not have an url: %s", image)
-        async with self.session.delete(image.url, timeout=20) as resp:  # type: ignore
-            if resp.status == 204:
-                return True
+
+        try:
+            async with self.session.delete(image.url, timeout=20) as resp:  # type: ignore
+                if resp.status == 204:
+                    return True
+                logging.error(
+                    "Unable to delete image %s(%s) with status %s",
+                    image.name,
+                    image.url,
+                    resp.status,
+                )
+            return False
+        except TimeoutError:
             logging.error(
-                "Unable to delete image %s(%s) with status %s",
+                "Unable to delete image %s(%s) due to timeout",
                 image.name,
                 image.url,
-                resp.status,
             )
-        return False
+            return False
 
     @ensure_user_checked
     async def delete_images(self, images: list[Image]) -> list[bool]:
