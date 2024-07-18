@@ -146,4 +146,4 @@ async def main(retention_args: RetentionArgs):
             "\n\t".join(str(img) for img in to_delete),
         )
     logging.info("Done")
-    api.close()
+    await api.close()
