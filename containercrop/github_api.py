@@ -84,6 +84,9 @@ class GithubAPI:
         )
         self.is_user: bool | None = is_user
 
+    def close(self):
+        self.session.close()
+
     @staticmethod
     def ensure_user_checked(method):
         """
