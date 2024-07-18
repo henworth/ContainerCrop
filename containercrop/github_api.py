@@ -165,7 +165,7 @@ class GithubAPI:
         "Delete an image"
         if not image.url:
             logging.info("Could not delete image as it does not have an url: %s", image)
-        async with self.session.delete(image.url) as resp:  # type: ignore
+        async with self.session.delete(image.url, timeout=20) as resp:  # type: ignore
             if resp.status == 204:
                 return True
             logging.error(
